@@ -1,0 +1,19 @@
+name: Retry Permission Fixture
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions: {}
+jobs:
+  fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    permissions:
+      contents: write
+    steps:
+      - name: Controlled result
+        env:
+          FIXTURE_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [ "$GITHUB_RUN_ATTEMPT" -gt 1 ]; then exit 0; fi
+          if [[ "$FIXTURE_TITLE" == *cancel* ]]; then sleep 120; fi
+          exit 1
